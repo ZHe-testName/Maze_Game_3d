@@ -3,6 +3,10 @@
 const world = document.getElementById('world'),
     container = document.getElementById('container');
 
+//World constants
+const pi = 3.141592,
+    degree = pi / 180;
+
 //Indicators of press/letting go move buttons
 let pressForward = 0,
     pressBack = 0,
@@ -38,11 +42,15 @@ class Pawn{
 
 const updeteWorld = () => {
     //Calculate offset
-    let deltaX = (pressRight - pressLeft);
-    let deltaZ = -(pressForward - pressBack); 
-    let deltaY = pressUp;
+    let deltaX = (pressRight - pressLeft) * Math.cos(pawn.ry * degree) - 
+        (pressForward - pressBack) * Math.sin(pawn.ry * degree);
+
+    let deltaZ = -(pressForward - pressBack) * Math.cos(pawn.ry * degree) -
+    (pressRight - pressLeft) * Math.sin(pawn.ry * degree); 
+
+    let deltaY = -pressUp;
     let deltaRx = mouseY;
-    let deltaRy = mouseX;
+    let deltaRy = -mouseX;
 
     //Zeroing of mouse move variables 
     //to avoid infinity adding for Pawn coords
@@ -57,7 +65,7 @@ const updeteWorld = () => {
 
     //Change the world coords for display
     world.style.transform = 
-        `rotateX(${-pawn.rx}deg) rotateY(${-pawn.ry}deg) translate3d(${-pawn.x}px, ${pawn.y}px, ${-pawn.z}px)`;
+        `translateZ(100px) rotateX(${-pawn.rx}deg) rotateY(${-pawn.ry}deg) translate3d(${-pawn.x}px, ${-pawn.y}px, ${-pawn.z}px)`;
 };
 
 //Pressing to move buttons event listener
