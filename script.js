@@ -1,34 +1,74 @@
 'use strict';
 
+const world = document.getElementById('world');
+
+console.log(world);
+
 //Indicators of press/letting go move buttons
-let pressForward = false,
-    pressBack = false,
-    pressLeft = false,
-    pressRight = false,
-    pressUp = false;
+let pressForward = 0,
+    pressBack = 0,
+    pressLeft = 0,
+    pressRight = 0,
+    pressUp = 0;
 
 let onGround = true;
+
+//Walking person object(player)
+
+//x, y, y - coordinates of player at start
+//rx, ry - rotation angles of the player about x & y axis
+//when we move the Pawn by the world, words coordinates
+//will not to be change.
+//But Pawn coords will be change about the world
+
+//Relativety the player of game Pawn is stabil
+//but world is change constantly
+class Pawn{
+    constructor(x, y, z, rx, ry){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.rx = rx;
+        this.ry = ry;
+    }
+};
+
+const updeteWorld = () => {
+    //Calculate offset
+    let deltaX = (pressRight - pressLeft);
+    let deltaZ = -(pressForward - pressBack); 
+    let deltaY = pressUp;
+
+    //add offset to Pawn coords
+    pawn.x += deltaX;
+    pawn.y += deltaY;
+    pawn.z += deltaZ;
+
+    //Change the world coords for display
+    world.style.transform = 
+        `rotateX(${-pawn.rx}deg) rotateY(${-pawn.ry}deg) translate3d(${-pawn.x}px, ${pawn.y}px, ${-pawn.z}px)`;
+};
 
 //Pressing to move buttons event listener
 document.addEventListener('keydown', event => {
     switch(event.key){
         case 'a':
-            pressLeft = true;
+            pressLeft = 1;
             break;
         case 's':
-            pressBack = true;
+            pressBack = 1;
             break;
         case 'd':
-            pressRight = true;
+            pressRight = 1;
             break;
         case 'w':{
-            pressForward = true;
+            pressForward = 1;
             break;
         }
     }
 
     if(onGround && (event.keyCode === 32)){
-        pressUp = true;
+        pressUp = 1;
     }
 });
 
@@ -36,21 +76,29 @@ document.addEventListener('keydown', event => {
 document.addEventListener('keyup', event => {
     switch(event.key){
         case 'a':
-            pressLeft = false;
+            pressLeft = 0;
             break;
         case 's':
-            pressBack = false;
+            pressBack = 0;
             break;
         case 'd':
-            pressRight = false;
+            pressRight = 0;
             break;
         case 'w':{
-            pressForward = false;
+            pressForward = 0;
             break;
         }
     }
 
     if(event.keyCode === 32){
-        pressUp = false
+        pressUp = 0;
     }
+
+    console.log(pawn.x);
 });
+
+//Create the new player
+const pawn = new Pawn(0, 0, 0, 0, 0);
+
+//Run infinity cycle for th world updating
+let timer = setInterval(updeteWorld, 10);
