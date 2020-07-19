@@ -1,8 +1,7 @@
 'use strict';
 
-const world = document.getElementById('world');
-
-console.log(world);
+const world = document.getElementById('world'),
+    container = document.getElementById('container');
 
 //Indicators of press/letting go move buttons
 let pressForward = 0,
@@ -10,6 +9,10 @@ let pressForward = 0,
     pressLeft = 0,
     pressRight = 0,
     pressUp = 0;
+
+//mouse move variables
+let mouseX = 0,
+    mouseY = 0;
 
 let onGround = true;
 
@@ -38,11 +41,19 @@ const updeteWorld = () => {
     let deltaX = (pressRight - pressLeft);
     let deltaZ = -(pressForward - pressBack); 
     let deltaY = pressUp;
+    let deltaRx = mouseY;
+    let deltaRy = mouseX;
+
+    //Zeroing of mouse move variables 
+    //to avoid infinity adding for Pawn coords
+    mouseX = mouseY = 0;
 
     //add offset to Pawn coords
     pawn.x += deltaX;
     pawn.y += deltaY;
     pawn.z += deltaZ;
+    pawn.rx += deltaRx;
+    pawn.ry += deltaRy;
 
     //Change the world coords for display
     world.style.transform = 
@@ -94,7 +105,12 @@ document.addEventListener('keyup', event => {
         pressUp = 0;
     }
 
-    console.log(pawn.x);
+});
+
+//Mouse move listener
+container.addEventListener('mousemove', event => {
+    mouseX = event.movementX;
+    mouseY = event.movementY;
 });
 
 //Create the new player

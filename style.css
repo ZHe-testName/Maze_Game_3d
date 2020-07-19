@@ -27,3 +27,13 @@
     background-color: rgb(228, 52, 190);
     transform: rotateY(30deg);
 }
+
+#pawn{
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    transform: translate(-50%, -50%);
+    left: 600px;
+    top: 300px;
+    background-color: rgb(55, 89, 199);
+}
