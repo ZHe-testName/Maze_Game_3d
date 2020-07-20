@@ -18,11 +18,14 @@ let pressForward = 0,
 let mouseX = 0,
     mouseY = 0;
 
+//Mouse click lock variable
+let lock = false;
+
 let onGround = true;
 
 //Walking person object(player)
 
-//x, y, y - coordinates of player at start
+//x, y, z - coordinates of player at start
 //rx, ry - rotation angles of the player about x & y axis
 //when we move the Pawn by the world, words coordinates
 //will not to be change.
@@ -60,13 +63,27 @@ const updeteWorld = () => {
     pawn.x += deltaX;
     pawn.y += deltaY;
     pawn.z += deltaZ;
-    pawn.rx += deltaRx;
-    pawn.ry += deltaRy;
+
+    //If mouse cursor is lock allow mouse rotation
+    if(lock){
+        pawn.rx += deltaRx;
+        pawn.ry += deltaRy;
+    }
 
     //Change the world coords for display
     world.style.transform = 
-        `translateZ(100px) rotateX(${-pawn.rx}deg) rotateY(${-pawn.ry}deg) translate3d(${-pawn.x}px, ${-pawn.y}px, ${-pawn.z}px)`;
+        `translateZ(600px) rotateX(${-pawn.rx}deg) rotateY(${-pawn.ry}deg) translate3d(${-pawn.x}px, ${-pawn.y}px, ${-pawn.z}px)`;
 };
+
+//Lock mouse pointer listener
+document.addEventListener('pointerlockchange', () => {
+    lock = !lock;
+});
+
+//Lock the mouse click
+container.addEventListener('click', () => {
+    if(!lock) container.requestPointerLock();
+})
 
 //Pressing to move buttons event listener
 document.addEventListener('keydown', event => {
@@ -116,7 +133,7 @@ document.addEventListener('keyup', event => {
 });
 
 //Mouse move listener
-container.addEventListener('mousemove', event => {
+document.addEventListener('mousemove', event => {
     mouseX = event.movementX;
     mouseY = event.movementY;
 });
