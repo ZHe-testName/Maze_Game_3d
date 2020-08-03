@@ -23,6 +23,15 @@ let lock = false;
 
 let onGround = true;
 
+//Array of rects for world 
+let map = [
+    [0,0,1000,0,180,0,2000,200,"#F0C0FF"],
+    [0,0,-1000,0,0,0,2000,200,"#F0C0FF"],
+    [1000,0,0,0,-90,0,2000,200,"#F0C0FF"],
+    [-1000,0,0,0,90,0,2000,200,"#F0C0FF"],
+    [0,100,0,90,0,0,2000,2000,"#666666"]
+]
+
 //Walking person object(player)
 
 //x, y, z - coordinates of player at start
@@ -41,6 +50,31 @@ class Pawn{
         this.rx = rx;
         this.ry = ry;
     }
+};
+
+const createNewWorld = () => {
+    map.forEach((item, index) => {
+        //Creating new element of the world
+        let newElement = document.createElement('div');
+
+        newElement.className = "square";
+        newElement.id = `square${index}`;
+        newElement.style.width = `${item[6]}px`;
+        newElement.style.height = `${item[7]}px`;
+        newElement.style.background = `${item[8]}`;
+        newElement.style.border = '3px solid black';
+
+        newElement.style.transform = "translate3d(" +
+        (600 - item[6]/2 + item[0]) + "px," +
+        (400 - item[7]/2 + item[1]) + "px," +
+        (item[2]) + "px)" +
+        "rotateX(" + item[3] + "deg)" +
+        "rotateY(" + item[4] + "deg)" +
+        "rotateZ(" + item[5] + "deg)";
+
+        //Incert new element into the world
+        world.append(newElement);
+    });
 };
 
 const updeteWorld = () => {
@@ -141,5 +175,6 @@ document.addEventListener('mousemove', event => {
 //Create the new player
 const pawn = new Pawn(0, 0, 0, 0, 0);
 
+createNewWorld();
 //Run infinity cycle for th world updating
 let timer = setInterval(updeteWorld, 10);

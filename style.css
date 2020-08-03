@@ -20,7 +20,7 @@
     transform-style: preserve-3d;
 }
 
-#square1{
+/* #square1{
     position: absolute;
     width: 150px;
     height: 150px;
@@ -38,6 +38,10 @@
 	left:600px;
 	background-color:#00FF00;
 	transform:translate(-50%, -50%) rotateX(90deg) translateZ(-100px);
+} */
+
+.square{
+    position: absolute;
 }
 
 #pawn{
