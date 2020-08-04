@@ -52,6 +52,38 @@ class Pawn{
     }
 };
 
+const coordsTransform = (x0, y0, z0, rxc, ryc, rzc) => {
+    let x1 = x0,
+        y1 = y0 * Math.cos(rxc * degree) + z0 * Math.sin(rxc * degree),
+        z1 = -y0 * Math.sin(rxc * degree) + z0 * Math.cos(rxc * degree),
+        
+        x2 = x1 * Math.cos(ryc * degree) - z1 * Math.sin(ryc * degree),
+        y2 = y1,
+        z2 = x1 * Math.sin(ryc * degree) + z1 * Math.cos(ryc * degree),
+        
+        x3 = x2 * Math.cos(rzc * degree) + y2 * Math.sin(rzc* degree),
+        y3 = -x2 * Math.sin(rzc * degree) + y2 * Math.cos(rzc * degree),
+        z3 = z2;
+
+        return [x3, y3, z3];
+};
+
+const coordsReTransform  = (x3, y3, z3, rxc, ryc, rzc) =>{
+	let x2 =  x3 * Math.cos(rzc * degree) - y3 * Math.sin(rzc * degree),
+	    y2 =  x3 * Math.sin(rzc * degree) + y3 * Math.cos(rzc * degree),
+        z2 =  z3,
+        
+	    x1 =  x2 * Math.cos(ryc * degree) + z2 * Math.sin(ryc * degree),
+	    y1 =  y2,
+	    z1 = -x2 * Math.sin(ryc * degree) + z2 * Math.cos(ryc * degree),
+        
+        x0 =  x1,
+	    y0 =  y1 * Math.cos(rxc * degree) - z1 * Math.sin(rxc * degree),
+        z0 =  y1 * Math.sin(rxc * degree) + z1 * Math.cos(rxc * degree);
+        
+	    return [x0, y0, z0];
+};
+
 const createNewWorld = () => {
     map.forEach((item, index) => {
         //Creating new element of the world
@@ -93,6 +125,40 @@ const updeteWorld = () => {
     //to avoid infinity adding for Pawn coords
     mouseX = mouseY = 0;
 
+    //Check colizion with rect's
+    for(let i = 0; i < map.length; i++){
+		
+		//calculate player coords in coords system of rect
+		
+		let x0 = (pawn.x - map[i][0]);
+		let y0 = (pawn.y - map[i][1]);
+        let z0 = (pawn.z - map[i][2]);
+        
+        if ((x0**2 + y0**2 + z0**2 + deltaX**2 + deltaY**2 + deltaZ**2) < (map[i][6]**2 + map[i][7]**2)){
+		
+			let x1 = x0 + deltaX;
+			let y1 = y0 + deltaY;
+			let z1 = z0 + deltaZ;
+		
+			let point0 = coordsTransform(x0, y0, z0, map[i][3], map[i][4], map[i][5]);
+			let point1 = coordsTransform(x1, y1, z1, map[i][3], map[i][4], map[i][5]);
+			let point2 = new Array();
+		
+			// Условие коллизии и действия при нем
+		
+			if (Math.abs(point1[0]) < (map[i][6] + 98) / 2 && Math.abs(point1[1]) < (map[i][7] + 98) / 2 && Math.abs(point1[2]) < 50){
+                console.log('done');
+                point1[2] = Math.sign(point0[2]) * 50;
+                point2 = coordsReTransform(point1[0], point1[1], point1[2], map[i][3], map[i][4], map[i][5]);
+                
+				deltaX = point2[0] - x0;
+				deltaY = point2[1] - y0;
+				deltaZ = point2[2] - z0;
+			}
+			
+		}
+    };	
+    
     //add offset to Pawn coords
     pawn.x += deltaX;
     pawn.y += deltaY;
@@ -173,8 +239,9 @@ document.addEventListener('mousemove', event => {
 });
 
 //Create the new player
-const pawn = new Pawn(0, 0, 0, 0, 0);
+const pawn = new Pawn(-900, 0, -900, 0, 0);
 
 createNewWorld();
-//Run infinity cycle for th world updating
+
+//Run infinity cycle for the world updating
 let timer = setInterval(updeteWorld, 10);
