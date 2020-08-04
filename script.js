@@ -5,7 +5,8 @@ const world = document.getElementById('world'),
 
 //World constants
 const pi = 3.141592,
-    degree = pi / 180;
+    degree = pi / 180,
+    g = 8.8;
 
 //Indicators of press/letting go move buttons
 let pressForward = 0,
@@ -29,6 +30,11 @@ let map = [
     [0,0,-1000,0,0,0,2000,200,"#F0C0FF"],
     [1000,0,0,0,-90,0,2000,200,"#F0C0FF"],
     [-1000,0,0,0,90,0,2000,200,"#F0C0FF"],
+    [0,0,-300,70,0,0,200,500,"#F000FF"],
+    [0,-86,-786,90,0,0,200,500,"#F000FF"],
+    [-500,0,-300,20,0,0,200,500,"#00FF00"],
+    [0,-800,0,90,0,0,500,500,"#00FF00"],
+    [0,-400,700,60,0,0,500,900,"#FFFF00"],
     [0,100,0,90,0,0,2000,2000,"#666666"]
 ]
 
@@ -49,6 +55,9 @@ class Pawn{
         this.z = z;
         this.rx = rx;
         this.ry = ry;
+        this.vx = 3;
+        this.vy = 5;
+        this.vz = 3;
     }
 };
 
@@ -112,12 +121,23 @@ const createNewWorld = () => {
 const updeteWorld = () => {
     //Calculate offset
     let deltaX = (pressRight - pressLeft) * Math.cos(pawn.ry * degree) - 
-        (pressForward - pressBack) * Math.sin(pawn.ry * degree);
+        (pressForward - pressBack) * Math.sin(pawn.ry * degree) * pawn.vx;
 
     let deltaZ = -(pressForward - pressBack) * Math.cos(pawn.ry * degree) -
-    (pressRight - pressLeft) * Math.sin(pawn.ry * degree); 
+    (pressRight - pressLeft) * Math.sin(pawn.ry * degree) * pawn.vz; 
 
-    let deltaY = -pressUp;
+    let deltaY = 0;
+    deltaY += g;
+
+    if(onGround){
+        deltaY = 0;
+
+        if(pressUp){
+            deltaY = - pressUp * pawn.vy;
+            onGround = false;
+        }
+    }
+
     let deltaRx = mouseY;
     let deltaRy = -mouseX;
 
@@ -126,6 +146,8 @@ const updeteWorld = () => {
     mouseX = mouseY = 0;
 
     //Check colizion with rect's
+    onGround = false;
+
     for(let i = 0; i < map.length; i++){
 		
 		//calculate player coords in coords system of rect
@@ -142,21 +164,26 @@ const updeteWorld = () => {
 		
 			let point0 = coordsTransform(x0, y0, z0, map[i][3], map[i][4], map[i][5]);
 			let point1 = coordsTransform(x1, y1, z1, map[i][3], map[i][4], map[i][5]);
-			let point2 = new Array();
+			let normal = coordsReTransform(0, 0, 1, map[i][3], map[i][4], map[i][5]);
 		
 			// Условие коллизии и действия при нем
 		
 			if (Math.abs(point1[0]) < (map[i][6] + 98) / 2 && Math.abs(point1[1]) < (map[i][7] + 98) / 2 && Math.abs(point1[2]) < 50){
-                console.log('done');
-                point1[2] = Math.sign(point0[2]) * 50;
-                point2 = coordsReTransform(point1[0], point1[1], point1[2], map[i][3], map[i][4], map[i][5]);
-                
+				point1[2] = Math.sign(point0[2]) * 50;
+				let point2 = coordsReTransform(point1[0], point1[1], point1[2], map[i][3], map[i][4], map[i][5]);
+				let point3 = coordsReTransform(point1[0], point1[1], 0, map[i][3], map[i][4], map[i][5]);
 				deltaX = point2[0] - x0;
 				deltaY = point2[1] - y0;
-				deltaZ = point2[2] - z0;
+                deltaZ = point2[2] - z0;
+                
+				if (Math.abs(normal[1]) > 0.8){
+					if (point3[1] > point2[1]) onGround = true;
+				}
+				else deltaY = y1 - y0;
 			}
 			
 		}
+			
     };	
     
     //add offset to Pawn coords
@@ -203,8 +230,8 @@ document.addEventListener('keydown', event => {
         }
     }
 
-    if(onGround && (event.keyCode === 32)){
-        pressUp = 1;
+    if(event.keyCode === 32){
+        pressUp = 10;
     }
 });
 
@@ -239,7 +266,7 @@ document.addEventListener('mousemove', event => {
 });
 
 //Create the new player
-const pawn = new Pawn(-900, 0, -900, 0, 0);
+const pawn = new Pawn(0, -900, 0, 0, 0);
 
 createNewWorld();
 

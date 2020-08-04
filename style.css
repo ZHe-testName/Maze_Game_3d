@@ -58,3 +58,52 @@
     top: 400px;
     background-color: rgb(55, 89, 199);
 }
+
+
+
+.menu{
+    position: absolute;
+    display: none;
+    width: inherit;
+    height: inherit;
+    background-color:#C0FFFF;
+}
+
+#menu1{
+    display: block;
+}
+
+.button{
+    margin: 0;
+    position: absolute;
+    height: 225px;
+    width: 900px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.button:hover{
+    background-color: #DDD;
+}
+
+
+
+#button1{
+    top: 100px;
+    left: 150px;
+}
+
+#button2{
+    top: 450px;
+    left: 150px;
+}
+
+#button3{
+    top: 450px;
+    left: 150px;
+}
+
+#button4{
+    top: 450px;
+    left: 150px;
+}
